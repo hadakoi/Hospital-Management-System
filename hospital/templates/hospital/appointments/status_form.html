@@ -1,0 +1,57 @@
+{% extends 'hospital/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Update Appointment Status - Hospital Management System{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'appointment_list' %}">Appointments</a></li>
+            <li class="breadcrumb-item active">Update Status</li>
+        </ol>
+    </nav>
+    
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="card dashboard-card">
+                <div class="card-header bg-warning text-white">
+                    <h4 class="mb-0"><i class="bi bi-pencil"></i> Update Appointment Status</h4>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info mb-4">
+                        <strong>Appointment:</strong><br>
+                        Patient: {{ appointment.patient }}<br>
+                        Doctor: {{ appointment.doctor }}<br>
+                        Date: {{ appointment.appointment_date|date:"M d, Y" }} at {{ appointment.appointment_time|time:"H:i" }}
+                    </div>
+                    
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+                        
+                        {{ form.status|as_crispy_field }}
+                        {{ form.cancellation_notes|as_crispy_field }}
+                        
+                        <div class="alert alert-light">
+                            <small class="text-muted">
+                                <i class="bi bi-info-circle"></i> 
+                                If cancelling or postponing, please provide a reason in the notes field above.
+                            </small>
+                        </div>
+                        
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                            <a href="{% url 'appointment_detail' appointment.pk %}" class="btn btn-outline-secondary">
+                                <i class="bi bi-x-circle"></i> Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-circle"></i> Update Status
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

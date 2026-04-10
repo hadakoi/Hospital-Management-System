@@ -1,0 +1,75 @@
+{% extends 'hospital/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Create Medical Record - Hospital Management System{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'appointment_list' %}">Appointments</a></li>
+            <li class="breadcrumb-item active">Create Medical Record</li>
+        </ol>
+    </nav>
+    
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card dashboard-card">
+                <div class="card-header bg-success text-white">
+                    <h4 class="mb-0"><i class="bi bi-file-medical"></i> Create Medical Record</h4>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info mb-4">
+                        <strong>Patient:</strong> {{ appointment.patient }}<br>
+                        <strong>Doctor:</strong> {{ appointment.doctor }}<br>
+                        <strong>Appointment Date:</strong> {{ appointment.appointment_date|date:"M d, Y" }}
+                    </div>
+                    
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+                        
+                        <h5 class="mb-3 text-muted">Medical Information</h5>
+                        {{ form.diagnosis|as_crispy_field }}
+                        {{ form.symptoms|as_crispy_field }}
+                        {{ form.prescription|as_crispy_field }}
+                        {{ form.notes|as_crispy_field }}
+                        
+                        <hr class="my-4">
+                        <h5 class="mb-3 text-muted">Vitals</h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                {{ form.blood_pressure|as_crispy_field }}
+                            </div>
+                            <div class="col-md-6">
+                                {{ form.temperature|as_crispy_field }}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                {{ form.weight|as_crispy_field }}
+                            </div>
+                            <div class="col-md-6">
+                                {{ form.heart_rate|as_crispy_field }}
+                            </div>
+                        </div>
+                        
+                        <hr class="my-4">
+                        <h5 class="mb-3 text-muted">Follow-up</h5>
+                        {{ form.follow_up_date|as_crispy_field }}
+                        
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                            <a href="{% url 'doctor_dashboard' %}" class="btn btn-outline-secondary">
+                                <i class="bi bi-x-circle"></i> Cancel
+                            </a>
+                            <button type="submit" class="btn btn-success">
+                                <i class="bi bi-check-circle"></i> Save Medical Record
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,135 @@
+{% extends 'hospital/base.html' %}
+
+{% block title %}Medical Record - Hospital Management System{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'medical_record_list' %}">Medical Records</a></li>
+            <li class="breadcrumb-item active">Record Details</li>
+        </ol>
+    </nav>
+    
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="bi bi-file-medical"></i> Medical Record</h2>
+        <span class="text-muted">{{ record.created_at|date:"F d, Y" }}</span>
+    </div>
+    
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="card dashboard-card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <i class="bi bi-clipboard-pulse"></i> Diagnosis & Treatment
+                </div>
+                <div class="card-body">
+                    <h5 class="mb-3">Diagnosis</h5>
+                    <p class="mb-4">{{ record.diagnosis|linebreaks }}</p>
+                    
+                    {% if record.symptoms %}
+                    <h6 class="text-muted">Symptoms</h6>
+                    <p>{{ record.symptoms|linebreaks }}</p>
+                    {% endif %}
+                    
+                    {% if record.prescription %}
+                    <hr>
+                    <h5 class="mb-3"><i class="bi bi-capsule"></i> Prescription</h5>
+                    <div class="alert alert-light border">
+                        <pre class="mb-0" style="white-space: pre-wrap;">{{ record.prescription }}</pre>
+                    </div>
+                    {% endif %}
+                    
+                    {% if record.notes %}
+                    <hr>
+                    <h6 class="text-muted">Additional Notes</h6>
+                    <p>{{ record.notes|linebreaks }}</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="card dashboard-card mb-4">
+                <div class="card-header bg-info text-white">
+                    <i class="bi bi-activity"></i> Vitals
+                </div>
+                <div class="card-body">
+                    <table class="table table-borderless">
+                        <tr>
+                            <td class="text-muted">Blood Pressure</td>
+                            <td class="text-end">{{ record.blood_pressure|default:"N/A" }}</td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">Temperature</td>
+                            <td class="text-end">
+                                {% if record.temperature %}
+                                {{ record.temperature }} °C
+                                {% else %}
+                                N/A
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">Weight</td>
+                            <td class="text-end">
+                                {% if record.weight %}
+                                {{ record.weight }} kg
+                                {% else %}
+                                N/A
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">Heart Rate</td>
+                            <td class="text-end">
+                                {% if record.heart_rate %}
+                                {{ record.heart_rate }} bpm
+                                {% else %}
+                                N/A
+                                {% endif %}
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="card dashboard-card mb-4">
+                <div class="card-header bg-success text-white">
+                    <i class="bi bi-person"></i> Patient
+                </div>
+                <div class="card-body">
+                    <h5>{{ record.patient }}</h5>
+                    <p class="text-muted mb-1">
+                        <i class="bi bi-droplet"></i> {{ record.patient.blood_group|default:"N/A" }}
+                    </p>
+                    <a href="{% url 'patient_detail' record.patient.pk %}" class="btn btn-outline-primary btn-sm w-100">
+                        View Patient Profile
+                    </a>
+                </div>
+            </div>
+            
+            <div class="card dashboard-card mb-4">
+                <div class="card-header bg-warning text-white">
+                    <i class="bi bi-person-badge"></i> Doctor
+                </div>
+                <div class="card-body">
+                    <h5>{{ record.doctor }}</h5>
+                    <p class="text-muted">{{ record.doctor.specialization }}</p>
+                </div>
+            </div>
+            
+            {% if record.follow_up_date %}
+            <div class="card dashboard-card border-warning">
+                <div class="card-header bg-warning text-white">
+                    <i class="bi bi-calendar-check"></i> Follow-up Date
+                </div>
+                <div class="card-body text-center">
+                    <h4 class="mb-0">{{ record.follow_up_date|date:"F d, Y" }}</h4>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

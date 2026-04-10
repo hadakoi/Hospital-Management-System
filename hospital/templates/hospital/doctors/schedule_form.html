@@ -1,0 +1,42 @@
+{% extends 'hospital/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Add Schedule - Hospital Management System{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'doctor_list' %}">Doctors</a></li>
+            <li class="breadcrumb-item active">Add Schedule</li>
+        </ol>
+    </nav>
+    
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="card dashboard-card">
+                <div class="card-header bg-info text-white">
+                    <h4 class="mb-0"><i class="bi bi-calendar-plus"></i> Add Schedule Slot</h4>
+                </div>
+                <div class="card-body">
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+                        
+                        {{ form|crispy }}
+                        
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                            <a href="{% url 'doctor_detail' view.kwargs.doctor_pk %}" class="btn btn-outline-secondary">
+                                <i class="bi bi-x-circle"></i> Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-circle"></i> Add Schedule
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

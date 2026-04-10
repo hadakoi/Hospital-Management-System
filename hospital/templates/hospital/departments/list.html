@@ -1,0 +1,45 @@
+{% extends 'hospital/base.html' %}
+
+{% block title %}Departments - Hospital Management System{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="bi bi-building"></i> Departments</h2>
+        {% if user.profile.role == 'admin' %}
+        <a href="{% url 'department_create' %}" class="btn btn-primary">
+            <i class="bi bi-plus"></i> Add Department
+        </a>
+        {% endif %}
+    </div>
+    
+    <div class="row g-4">
+        {% for dept in departments %}
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">{{ dept.name }}</h5>
+                    <p class="card-text text-muted">{{ dept.description|truncatewords:15|default:"No description" }}</p>
+                    <hr>
+                    <div class="d-flex justify-content-between">
+                        <span class="text-muted">
+                            <i class="bi bi-person-badge"></i> {{ dept.doctors.count }} doctors
+                        </span>
+                        <span class="text-muted">
+                            <i class="bi bi-people"></i> {{ dept.staff.count }} staff
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12 text-center">
+            <div class="py-5">
+                <i class="bi bi-building display-1 text-muted"></i>
+                <p class="text-muted mt-3">No departments available</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

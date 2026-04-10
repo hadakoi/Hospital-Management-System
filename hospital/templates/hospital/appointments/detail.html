@@ -1,0 +1,138 @@
+{% extends 'hospital/base.html' %}
+
+{% block title %}Appointment Details - Hospital Management System{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'appointment_list' %}">Appointments</a></li>
+            <li class="breadcrumb-item active">Details</li>
+        </ol>
+    </nav>
+    
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="bi bi-calendar-event"></i> Appointment Details</h2>
+        {% if user.profile.role == 'staff' or user.profile.role == 'doctor' %}
+        <a href="{% url 'appointment_update_status' appointment.pk %}" class="btn btn-primary">
+            <i class="bi bi-pencil"></i> Update Status
+        </a>
+        {% endif %}
+    </div>
+    
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="card dashboard-card mb-4">
+                <div class="card-header bg-white">
+                    <span class="badge status-badge 
+                        {% if appointment.status == 'pending' %}bg-warning text-dark
+                        {% elif appointment.status == 'confirmed' %}bg-primary
+                        {% elif appointment.status == 'completed' %}bg-success
+                        {% else %}bg-danger{% endif %} fs-6">
+                        {{ appointment.status|title }}
+                    </span>
+                </div>
+                <div class="card-body">
+                    <table class="table table-borderless">
+                        <tr>
+                            <td class="text-muted" width="30%">Patient</td>
+                            <td><strong>{{ appointment.patient }}</strong></td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">Doctor</td>
+                            <td><strong>{{ appointment.doctor }}</strong></td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">Date</td>
+                            <td>{{ appointment.appointment_date|date:"l, F d, Y" }}</td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">Time</td>
+                            <td>{{ appointment.appointment_time|time:"h:i A" }}</td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">Scheduled By</td>
+                            <td>{{ appointment.scheduled_by|default:"Patient" }}</td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">Created</td>
+                            <td>{{ appointment.created_at|date:"M d, Y H:i" }}</td>
+                        </tr>
+                    </table>
+                    
+                    {% if appointment.symptoms %}
+                    <hr>
+                    <h6 class="text-muted">Symptoms</h6>
+                    <p>{{ appointment.symptoms|linebreaks }}</p>
+                    {% endif %}
+                    
+                    {% if appointment.notes %}
+                    <hr>
+                    <h6 class="text-muted">Notes</h6>
+                    <p>{{ appointment.notes|linebreaks }}</p>
+                    {% endif %}
+                    
+                    {% if appointment.cancellation_notes %}
+                    <hr>
+                    <div class="alert alert-warning">
+                        <h6 class="alert-heading"><i class="bi bi-exclamation-triangle"></i> Cancellation/Postponement Reason</h6>
+                        <p class="mb-0">{{ appointment.cancellation_notes }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            {% if appointment.status == 'confirmed' and user.profile.role == 'doctor' and appointment.doctor.user == user %}
+            <div class="card dashboard-card">
+                <div class="card-body text-center">
+                    <h5>Complete this appointment?</h5>
+                    <p class="text-muted">Add a medical record after completing the appointment</p>
+                    <a href="{% url 'medical_record_create' appointment.pk %}" class="btn btn-success">
+                        <i class="bi bi-file-medical"></i> Create Medical Record
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="card dashboard-card">
+                <div class="card-header bg-primary text-white">
+                    <i class="bi bi-person"></i> Patient Info
+                </div>
+                <div class="card-body">
+                    <p><strong>{{ appointment.patient }}</strong></p>
+                    <p class="text-muted mb-1">
+                        <i class="bi bi-telephone"></i> {{ appointment.patient.emergency_contact_phone|default:"N/A" }}
+                    </p>
+                    <p class="text-muted mb-1">
+                        <i class="bi bi-droplet"></i> Blood Group: {{ appointment.patient.blood_group|default:"N/A" }}
+                    </p>
+                    <a href="{% url 'patient_detail' appointment.patient.pk %}" class="btn btn-outline-primary btn-sm w-100 mt-2">
+                        <i class="bi bi-eye"></i> View Patient Profile
+                    </a>
+                </div>
+            </div>
+            
+            <div class="card dashboard-card mt-4">
+                <div class="card-header bg-info text-white">
+                    <i class="bi bi-person-badge"></i> Doctor Info
+                </div>
+                <div class="card-body">
+                    <p><strong>{{ appointment.doctor }}</strong></p>
+                    <p class="text-muted mb-1">
+                        <i class="bi bi-briefcase"></i> {{ appointment.doctor.specialization }}
+                    </p>
+                    <p class="text-muted mb-1">
+                        <i class="bi bi-building"></i> {{ appointment.doctor.department|default:"N/A" }}
+                    </p>
+                    <a href="{% url 'doctor_detail' appointment.doctor.pk %}" class="btn btn-outline-info btn-sm w-100 mt-2">
+                        <i class="bi bi-eye"></i> View Doctor Profile
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,89 @@
+{% extends 'hospital/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Book Appointment - Hospital Management System{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'appointment_list' %}">Appointments</a></li>
+            <li class="breadcrumb-item active">Book Appointment</li>
+        </ol>
+    </nav>
+    
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card dashboard-card">
+                <div class="card-header bg-success text-white">
+                    <h4 class="mb-0">
+                        {% if patient %}
+                        <i class="bi bi-calendar-plus"></i> Book Appointment for {{ patient }}
+                        {% else %}
+                        <i class="bi bi-calendar-plus"></i> Book Appointment
+                        {% endif %}
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+                        
+                        {% if patient %}
+                        <input type="hidden" name="patient" value="{{ patient.pk }}">
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle"></i> Booking appointment for: <strong>{{ patient }}</strong>
+                        </div>
+                        {% endif %}
+                        
+                        <div class="row">
+                            <div class="col-md-12">
+                                {{ form.doctor|as_crispy_field }}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                {{ form.appointment_date|as_crispy_field }}
+                            </div>
+                            <div class="col-md-6">
+                                {{ form.appointment_time|as_crispy_field }}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                {{ form.symptoms|as_crispy_field }}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                {{ form.notes|as_crispy_field }}
+                            </div>
+                        </div>
+                        
+                        <div class="alert alert-warning">
+                            <i class="bi bi-info-circle"></i> 
+                            <strong>Note:</strong> Please check the doctor's schedule before booking. 
+                            You can view doctor schedules in the <a href="{% url 'doctor_list' %}">Doctors section</a>.
+                        </div>
+                        
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                            {% if patient %}
+                            <a href="{% url 'patient_detail' patient.pk %}" class="btn btn-outline-secondary">
+                                <i class="bi bi-x-circle"></i> Cancel
+                            </a>
+                            {% else %}
+                            <a href="{% url 'appointment_list' %}" class="btn btn-outline-secondary">
+                                <i class="bi bi-x-circle"></i> Cancel
+                            </a>
+                            {% endif %}
+                            <button type="submit" class="btn btn-success">
+                                <i class="bi bi-check-circle"></i> Book Appointment
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

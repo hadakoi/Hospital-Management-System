@@ -1,0 +1,128 @@
+{% extends 'hospital/base.html' %}
+
+{% block title %}{{ doctor.get_full_name }} - Doctor Details{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'doctor_list' %}">Doctors</a></li>
+            <li class="breadcrumb-item active">{{ doctor.get_full_name }}</li>
+        </ol>
+    </nav>
+    
+    <div class="row g-4">
+        <!-- Doctor Profile -->
+        <div class="col-lg-4">
+            <div class="card dashboard-card">
+                <div class="card-body text-center">
+                    <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 120px; height: 120px; font-size: 3rem;">
+                        {{ doctor.user.first_name|first }}{{ doctor.user.last_name|first }}
+                    </div>
+                    <h4 class="card-title">{{ doctor.get_full_name }}</h4>
+                    <p class="text-muted">{{ doctor.specialization }}</p>
+                    <span class="badge bg-{% if doctor.is_active %}success{% else %}danger{% endif %}">
+                        {% if doctor.is_active %}Active{% else %}Inactive{% endif %}
+                    </span>
+                </div>
+            </div>
+            
+            <div class="card dashboard-card mt-4">
+                <div class="card-header bg-primary text-white">
+                    <i class="bi bi-info-circle"></i> Professional Info
+                </div>
+                <div class="card-body">
+                    <table class="table table-borderless">
+                        <tr>
+                            <td class="text-muted">Department</td>
+                            <td class="text-end">{{ doctor.department|default:"N/A" }}</td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">Qualification</td>
+                            <td class="text-end">{{ doctor.qualification }}</td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">Experience</td>
+                            <td class="text-end">{{ doctor.experience_years }} years</td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">Consultation Fee</td>
+                            <td class="text-end">${{ doctor.consultation_fee }}</td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">Email</td>
+                            <td class="text-end">{{ doctor.user.email|default:"N/A" }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Schedule -->
+        <div class="col-lg-8">
+            <div class="card dashboard-card">
+                <div class="card-header bg-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span><i class="bi bi-calendar-week"></i> Weekly Schedule</span>
+                        {% if user.profile.role == 'admin' or user == doctor.user %}
+                        <a href="{% url 'doctor_schedule_create' doctor.pk %}" class="btn btn-sm btn-primary">
+                            <i class="bi bi-plus"></i> Add Schedule
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% if schedules %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Day</th>
+                                    <th>Start Time</th>
+                                    <th>End Time</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for schedule in schedules %}
+                                <tr>
+                                    <td>{{ schedule.get_day_of_week_display }}</td>
+                                    <td>{{ schedule.start_time|time:"H:i" }}</td>
+                                    <td>{{ schedule.end_time|time:"H:i" }}</td>
+                                    <td>
+                                        {% if schedule.is_available %}
+                                        <span class="badge bg-success">Available</span>
+                                        {% else %}
+                                        <span class="badge bg-secondary">Unavailable</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-4">
+                        <i class="bi bi-calendar-x display-4 text-muted"></i>
+                        <p class="text-muted mt-2">No schedule set</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            {% if user.is_authenticated and user.profile.role == 'patient' %}
+            <div class="card dashboard-card mt-4">
+                <div class="card-body text-center">
+                    <h5>Need an Appointment?</h5>
+                    <p class="text-muted">Book an appointment with Dr. {{ doctor.user.last_name }} now</p>
+                    <a href="{% url 'appointment_create' %}" class="btn btn-success">
+                        <i class="bi bi-calendar-plus"></i> Book Appointment
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
