@@ -13,14 +13,12 @@ from .models import (
 )
 
 
-# Inline for UserProfile
 class UserProfileInline(admin.StackedInline):
     model = UserProfile
     can_delete = False
     verbose_name_plural = "Profile"
 
 
-# Extend UserAdmin to include profile
 class UserAdmin(BaseUserAdmin):
     inlines = (UserProfileInline,)
     list_display = (
@@ -39,7 +37,6 @@ class UserAdmin(BaseUserAdmin):
     get_role.short_description = "Role"
 
 
-# Re-register UserAdmin
 admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
 

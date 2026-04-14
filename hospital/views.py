@@ -39,9 +39,6 @@ from .forms import (
 )
 
 
-# ============== ROLE CHECK HELPERS ==============
-
-
 def is_admin(user):
     return hasattr(user, "profile") and user.profile.role == "admin"
 
@@ -62,9 +59,6 @@ def is_doctor_or_staff(user):
     return is_doctor(user) or is_staff_member(user)
 
 
-# ============== HOME & AUTH VIEWS ==============
-
-
 class HomeView(TemplateView):
     template_name = "hospital/home.html"
 
@@ -78,7 +72,6 @@ class HomeView(TemplateView):
 
 
 def register_patient(request):
-    """Patient self-registration view"""
     if request.method == "POST":
         form = PatientRegistrationForm(request.POST)
         if form.is_valid():
@@ -95,7 +88,6 @@ def register_patient(request):
 
 @login_required
 def dashboard(request):
-    """Redirect to role-based dashboard"""
     if is_admin(request.user):
         return redirect("admin_dashboard")
     elif is_doctor(request.user):
@@ -107,13 +99,9 @@ def dashboard(request):
     return redirect("home")
 
 
-# ============== ADMIN DASHBOARD ==============
-
-
 @login_required
 @user_passes_test(is_admin)
 def admin_dashboard(request):
-    """Admin dashboard with statistics"""
     today = date.today()
 
     context = {
@@ -132,13 +120,9 @@ def admin_dashboard(request):
     return render(request, "hospital/dashboard/admin.html", context)
 
 
-# ============== DOCTOR DASHBOARD ==============
-
-
 @login_required
 @user_passes_test(is_doctor)
 def doctor_dashboard(request):
-    """Doctor dashboard with today's appointments"""
     doctor = request.user.doctor_profile
     today = date.today()
 
@@ -169,13 +153,9 @@ def doctor_dashboard(request):
     return render(request, "hospital/dashboard/doctor.html", context)
 
 
-# ============== PATIENT DASHBOARD ==============
-
-
 @login_required
 @user_passes_test(is_patient)
 def patient_dashboard(request):
-    """Patient dashboard with appointments and medical history"""
     patient = request.user.patient_profile
     today = date.today()
 
@@ -201,13 +181,9 @@ def patient_dashboard(request):
     return render(request, "hospital/dashboard/patient.html", context)
 
 
-# ============== STAFF DASHBOARD ==============
-
-
 @login_required
 @user_passes_test(is_staff_member)
 def staff_dashboard(request):
-    """Staff dashboard with all appointments and quick actions"""
     today = date.today()
 
     context = {
@@ -223,9 +199,6 @@ def staff_dashboard(request):
         "total_today": Appointment.objects.filter(appointment_date=today).count(),
     }
     return render(request, "hospital/dashboard/staff.html", context)
-
-
-# ============== PATIENT VIEWS ==============
 
 
 class PatientListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
@@ -262,7 +235,6 @@ class PatientDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
     def test_func(self):
         user = self.request.user
         patient = self.get_object()
-        # Admin, staff, doctors can view any patient; patients can only view their own
         return (
             is_admin(user)
             or is_staff_member(user)
@@ -296,15 +268,13 @@ class PatientCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
         return is_admin(self.request.user) or is_staff_member(self.request.user)
 
     def form_valid(self, form):
-        # Create user first
+        username = form.cleaned_data.get("username") or form.cleaned_data["email"]
         user = User.objects.create_user(
-            username=form.cleaned_data["username"]
-            if "username" in form.cleaned_data
-            else form.cleaned_data["email"],
+            username=username,
             email=form.cleaned_data["email"],
             first_name=form.cleaned_data["first_name"],
             last_name=form.cleaned_data["last_name"],
-            password="patient123",  # Default password
+            password="patient123",
         )
         user.profile.role = "patient"
         user.profile.save()
@@ -321,7 +291,6 @@ class PatientUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     template_name = "hospital/patients/form.html"
 
     def get_form_class(self):
-        # Patients can only update their own limited profile
         if (
             is_patient(self.request.user)
             and self.get_object().user == self.request.user
@@ -344,9 +313,6 @@ class PatientUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     def form_valid(self, form):
         messages.success(self.request, "Patient updated successfully!")
         return super().form_valid(form)
-
-
-# ============== DOCTOR VIEWS ==============
 
 
 class DoctorListView(LoginRequiredMixin, ListView):
@@ -433,9 +399,6 @@ class DoctorScheduleCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateVi
         return reverse_lazy("doctor_detail", kwargs={"pk": self.kwargs["doctor_pk"]})
 
 
-# ============== STAFF VIEWS ==============
-
-
 class StaffListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
     model = Staff
     template_name = "hospital/staff/list.html"
@@ -476,9 +439,6 @@ class StaffCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
         return super().form_valid(form)
 
 
-# ============== APPOINTMENT VIEWS ==============
-
-
 class AppointmentListView(LoginRequiredMixin, ListView):
     model = Appointment
     template_name = "hospital/appointments/list.html"
@@ -501,7 +461,6 @@ class AppointmentListView(LoginRequiredMixin, ListView):
         else:
             queryset = Appointment.objects.none()
 
-        # Filter by status if provided
         status = self.request.GET.get("status")
         if status:
             queryset = queryset.filter(status=status)
@@ -520,7 +479,6 @@ class AppointmentCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView)
     def form_valid(self, form):
         form.instance.scheduled_by = self.request.user
 
-        # If patient is booking for themselves
         if is_patient(self.request.user):
             form.instance.patient = self.request.user.patient_profile
 
@@ -536,7 +494,6 @@ class AppointmentCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView)
 @login_required
 @user_passes_test(lambda u: is_staff_member(u) or is_patient(u))
 def appointment_book_for_patient(request, patient_pk):
-    """Staff booking appointment for a specific patient"""
     patient = get_object_or_404(Patient, pk=patient_pk)
 
     if request.method == "POST":
@@ -579,7 +536,6 @@ class AppointmentDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView)
 @login_required
 @user_passes_test(is_doctor_or_staff)
 def appointment_update_status(request, pk):
-    """Update appointment status"""
     appointment = get_object_or_404(Appointment, pk=pk)
 
     if request.method == "POST":
@@ -596,9 +552,6 @@ def appointment_update_status(request, pk):
         "hospital/appointments/status_form.html",
         {"form": form, "appointment": appointment},
     )
-
-
-# ============== MEDICAL RECORD VIEWS ==============
 
 
 class MedicalRecordListView(LoginRequiredMixin, ListView):
@@ -664,7 +617,6 @@ class MedicalRecordCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateVie
         form.instance.patient = appointment.patient
         form.instance.doctor = self.request.user.doctor_profile
 
-        # Update appointment status to completed
         appointment.status = "completed"
         appointment.save()
 
@@ -673,9 +625,6 @@ class MedicalRecordCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateVie
 
     def get_success_url(self):
         return reverse_lazy("medical_record_detail", kwargs={"pk": self.object.pk})
-
-
-# ============== DEPARTMENT VIEWS ==============
 
 
 class DepartmentListView(LoginRequiredMixin, ListView):

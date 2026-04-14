@@ -2,15 +2,12 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    # Home
     path("", views.HomeView.as_view(), name="home"),
-    # Dashboard
     path("dashboard/", views.dashboard, name="dashboard"),
     path("admin/dashboard/", views.admin_dashboard, name="admin_dashboard"),
     path("doctor/dashboard/", views.doctor_dashboard, name="doctor_dashboard"),
     path("patient/dashboard/", views.patient_dashboard, name="patient_dashboard"),
     path("staff/dashboard/", views.staff_dashboard, name="staff_dashboard"),
-    # Patients
     path("patients/", views.PatientListView.as_view(), name="patient_list"),
     path("patients/add/", views.PatientCreateView.as_view(), name="patient_create"),
     path(
@@ -21,7 +18,6 @@ urlpatterns = [
         views.PatientUpdateView.as_view(),
         name="patient_update",
     ),
-    # Doctors
     path("doctors/", views.DoctorListView.as_view(), name="doctor_list"),
     path("doctors/add/", views.DoctorCreateView.as_view(), name="doctor_create"),
     path("doctors/<int:pk>/", views.DoctorDetailView.as_view(), name="doctor_detail"),
@@ -33,10 +29,8 @@ urlpatterns = [
         views.DoctorScheduleCreateView.as_view(),
         name="doctor_schedule_create",
     ),
-    # Staff
     path("staff/", views.StaffListView.as_view(), name="staff_list"),
     path("staff/add/", views.StaffCreateView.as_view(), name="staff_create"),
-    # Appointments
     path("appointments/", views.AppointmentListView.as_view(), name="appointment_list"),
     path(
         "appointments/book/",
@@ -58,7 +52,6 @@ urlpatterns = [
         views.appointment_update_status,
         name="appointment_update_status",
     ),
-    # Medical Records
     path(
         "medical-records/",
         views.MedicalRecordListView.as_view(),
@@ -74,7 +67,6 @@ urlpatterns = [
         views.MedicalRecordCreateView.as_view(),
         name="medical_record_create",
     ),
-    # Departments
     path("departments/", views.DepartmentListView.as_view(), name="department_list"),
     path(
         "departments/add/",

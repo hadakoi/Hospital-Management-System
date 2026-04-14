@@ -6,8 +6,6 @@ from django.utils import timezone
 
 
 class UserProfile(models.Model):
-    """Extended user profile for role management"""
-
     ROLE_CHOICES = [
         ("admin", "Admin"),
         ("doctor", "Doctor"),
@@ -26,8 +24,6 @@ class UserProfile(models.Model):
 
 
 class Department(models.Model):
-    """Hospital departments"""
-
     name = models.CharField(max_length=100)
     description = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -40,8 +36,6 @@ class Department(models.Model):
 
 
 class Doctor(models.Model):
-    """Doctor profile"""
-
     user = models.OneToOneField(
         User, on_delete=models.CASCADE, related_name="doctor_profile"
     )
@@ -68,8 +62,6 @@ class Doctor(models.Model):
 
 
 class DoctorSchedule(models.Model):
-    """Doctor availability schedule"""
-
     DAYS_OF_WEEK = [
         (0, "Monday"),
         (1, "Tuesday"),
@@ -97,8 +89,6 @@ class DoctorSchedule(models.Model):
 
 
 class Patient(models.Model):
-    """Patient profile"""
-
     GENDER_CHOICES = [
         ("male", "Male"),
         ("female", "Female"),
@@ -155,8 +145,6 @@ class Patient(models.Model):
 
 
 class Staff(models.Model):
-    """Staff/Receptionist profile"""
-
     DESIGNATION_CHOICES = [
         ("receptionist", "Receptionist"),
         ("nurse", "Nurse"),
@@ -190,8 +178,6 @@ class Staff(models.Model):
 
 
 class Appointment(models.Model):
-    """Appointment booking system"""
-
     STATUS_CHOICES = [
         ("pending", "Pending"),
         ("confirmed", "Confirmed"),
@@ -242,8 +228,6 @@ class Appointment(models.Model):
 
 
 class MedicalRecord(models.Model):
-    """Patient medical records"""
-
     patient = models.ForeignKey(
         Patient, on_delete=models.CASCADE, related_name="medical_records"
     )
@@ -263,7 +247,6 @@ class MedicalRecord(models.Model):
     prescription = models.TextField(blank=True, help_text="Medications prescribed")
     notes = models.TextField(blank=True, help_text="Additional medical notes")
 
-    # Vitals
     blood_pressure = models.CharField(
         max_length=20, blank=True, help_text="e.g., 120/80"
     )
@@ -286,7 +269,6 @@ class MedicalRecord(models.Model):
         return f"Record for {self.patient} - {self.created_at.date()}"
 
 
-# Signals to create user profile automatically
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
     if created:
