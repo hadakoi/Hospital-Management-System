@@ -214,6 +214,11 @@ class PatientListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
             or is_doctor(self.request.user)
         )
 
+    def handle_no_permission(self):
+        if is_patient(self.request.user):
+            return redirect("patient_dashboard")
+        return super().handle_no_permission()
+
     def get_queryset(self):
         queryset = Patient.objects.select_related("user").all()
         search = self.request.GET.get("search")
@@ -267,6 +272,11 @@ class PatientCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
     def test_func(self):
         return is_admin(self.request.user) or is_staff_member(self.request.user)
 
+    def handle_no_permission(self):
+        if is_patient(self.request.user):
+            return redirect("patient_dashboard")
+        return super().handle_no_permission()
+
     def form_valid(self, form):
         username = form.cleaned_data.get("username") or form.cleaned_data["email"]
         user = User.objects.create_user(
@@ -291,10 +301,10 @@ class PatientUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     template_name = "hospital/patients/form.html"
 
     def get_form_class(self):
-        if (
-            is_patient(self.request.user)
-            and self.get_object().user == self.request.user
-        ):
+        # Ensure self.object is available; fetch it if not already set
+        if not hasattr(self, "object") or self.object is None:
+            self.object = self.get_object()
+        if is_patient(self.request.user) and self.object.user == self.request.user:
             return PatientUpdateForm
         return PatientForm
 
@@ -306,6 +316,11 @@ class PatientUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
             or is_staff_member(user)
             or (is_patient(user) and patient.user == user)
         )
+
+    def handle_no_permission(self):
+        if is_patient(self.request.user):
+            return redirect("patient_dashboard")
+        return super().handle_no_permission()
 
     def get_success_url(self):
         return reverse_lazy("patient_detail", kwargs={"pk": self.object.pk})

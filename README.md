@@ -145,13 +145,73 @@ python manage.py runserver
 5. Confirm or cancel appointments
 6. View patient records
 
-## Appointment Status Workflow
+## Appointment Workflow
+
+### Status States
+
+| Status | Description | Badge Color |
+|--------|-------------|-------------|
+| **Pending** | Appointment booked, waiting for staff confirmation | Yellow |
+| **Confirmed** | Staff has approved the appointment | Blue |
+| **Completed** | Doctor finished consultation, medical record created | Green |
+| **Cancelled** | Appointment was cancelled by staff | Red |
+
+### Booking Flow
 
 ```
-Pending -> Confirmed -> Completed (Medical Record created)
-   |
-   -> Cancelled (with notes)
+┌─────────────┐     ┌─────────────┐     ┌─────────────┐     ┌─────────────┐
+│   Patient   │────▶│   Pending   │────▶│  Confirmed  │────▶│  Completed  │
+│  or Staff   │     │   (Booked)  │     │ (Accepted)  │     │  (Done +    │
+│  Books Appt │     │             │     │             │     │   Record)   │
+└─────────────┘     └─────────────┘     └─────────────┘     └─────────────┘
+                            │
+                            ▼
+                     ┌─────────────┐
+                     │  Cancelled  │
+                     │  (Reason)   │
+                     └─────────────┘
 ```
+
+### Step-by-Step Process
+
+1. **Booking** (Patient or Staff)
+   - Select doctor, date, and time slot
+   - System validates doctor availability against `DoctorSchedule`
+   - Appointment created with status = **PENDING**
+
+2. **Confirmation** (Staff/Receptionist)
+   - Staff sees pending appointments on their dashboard
+   - Staff reviews and confirms the appointment
+   - Status changes to **CONFIRMED**
+   - Patient can now see the confirmed appointment
+
+3. **Consultation** (Doctor)
+   - Doctor sees confirmed appointments on their dashboard
+   - Patient visits doctor at scheduled time
+   - After consultation, doctor creates medical record
+   - Status changes to **COMPLETED**
+
+4. **Cancellation** (Staff - Optional)
+   - Staff can cancel any pending or confirmed appointment
+   - Cancellation reason is recorded in `cancellation_notes`
+   - Status changes to **CANCELLED**
+
+### Role Permissions
+
+| Role | Book Appointments | Confirm/Update Status | Create Medical Records | View All Appointments |
+|------|------------------|---------------------|----------------------|---------------------|
+| **Patient** | Own only | No | No | Own only |
+| **Staff** | Any patient | Yes | No | All |
+| **Doctor** | No | Own patients only | Yes | Own patients |
+| **Admin** | No | Yes | No | All |
+
+### Validation Rules
+
+- Appointments must be scheduled for future dates/times
+- Doctor must be available at selected time (checked against `DoctorSchedule`)
+- Time slot cannot be already booked by another patient
+- Only staff/doctors can update appointment status
+- Medical records can only be created for **confirmed** appointments
 
 ## Database Models
 
