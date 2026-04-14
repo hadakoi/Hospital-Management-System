@@ -35,3 +35,8 @@ staticfiles/
 # Backup files
 *.bak
 *.backup
+
+# Submission scripts and documentation
+submissions/
+documentation_screenshots/
+Hospital_Management_System_Technical_Report.docx

@@ -4,7 +4,7 @@ from . import views
 urlpatterns = [
     path("", views.HomeView.as_view(), name="home"),
     path("dashboard/", views.dashboard, name="dashboard"),
-    path("admin/dashboard/", views.admin_dashboard, name="admin_dashboard"),
+    # Note: admin_dashboard is defined in root urls.py before Django admin
     path("doctor/dashboard/", views.doctor_dashboard, name="doctor_dashboard"),
     path("patient/dashboard/", views.patient_dashboard, name="patient_dashboard"),
     path("staff/dashboard/", views.staff_dashboard, name="staff_dashboard"),
