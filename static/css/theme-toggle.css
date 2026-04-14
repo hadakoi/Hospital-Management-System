@@ -1,0 +1,79 @@
+/**
+ * Theme Toggle Button Styles
+ * Floating toggle button for dark/light mode switching
+ */
+
+/* Theme Toggle Button - Fixed Bottom Right */
+.theme-toggle-btn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: none;
+    background-color: var(--bs-primary);
+    color: white;
+    cursor: pointer;
+    z-index: 1050;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+}
+
+.theme-toggle-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+}
+
+.theme-toggle-btn:active {
+    transform: scale(0.95);
+}
+
+.theme-toggle-btn i {
+    font-size: 1.5rem;
+    transition: transform 0.3s ease;
+}
+
+.theme-toggle-btn:hover i {
+    transform: rotate(15deg);
+}
+
+/* Dark mode specific adjustments */
+[data-bs-theme="dark"] .theme-toggle-btn {
+    background-color: var(--bs-warning);
+    color: var(--bs-dark);
+}
+
+[data-bs-theme="dark"] .theme-toggle-btn:hover {
+    background-color: #ffca2c;
+}
+
+/* Light mode adjustments */
+[data-bs-theme="light"] .theme-toggle-btn {
+    background-color: var(--bs-primary);
+    color: white;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 576px) {
+    .theme-toggle-btn {
+        bottom: 15px;
+        right: 15px;
+        width: 45px;
+        height: 45px;
+    }
+
+    .theme-toggle-btn i {
+        font-size: 1.25rem;
+    }
+}
+
+/* Ensure button doesn't overlap with footer on short pages */
+@media (max-height: 600px) {
+    .theme-toggle-btn {
+        bottom: 70px;
+    }
+}
